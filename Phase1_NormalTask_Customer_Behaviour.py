@@ -259,4 +259,121 @@ if 'BILL_ID' in working_data.columns:
 else:
     print("Column 'BILL_ID' not available in working data.")
 
+# Customer demographics
+customer_demographics = data.groupby('customer_id').agg({
+    'age': 'mean',
+    'gender': lambda x: x.mode()[0],
+    'location': lambda x: x.mode()[0]
+}).reset_index()
+
+print(customer_demographics.head())
+
+# RFM Analysis
+rfm = data.groupby('customer_id').agg({
+    'transaction_date': lambda x: (datetime.now() - x.max()).days,
+    'transaction_id': 'count',
+    'total_value': 'sum'
+}).reset_index()
+
+rfm.columns = ['customer_id', 'recency', 'frequency', 'monetary']
+
+# Apply KMeans clustering for segmentation
+kmeans = KMeans(n_clusters=4, random_state=42)
+rfm['segment'] = kmeans.fit_predict(rfm[['recency', 'frequency', 'monetary']])
+
+print(rfm.head())
+
+# Visualization of customer segments
+sns.scatterplot(x='recency', y='monetary', hue='segment', data=rfm)
+plt.title('Customer Segmentation')
+plt.show()
+
+# Customer demographics
+customer_demographics = data.groupby('customer_id').agg({
+    'age': 'mean',
+    'gender': lambda x: x.mode()[0],
+    'location': lambda x: x.mode()[0]
+}).reset_index()
+
+print(customer_demographics.head())
+
+# RFM Analysis
+rfm = data.groupby('customer_id').agg({
+    'transaction_date': lambda x: (datetime.now() - x.max()).days,
+    'transaction_id': 'count',
+    'total_value': 'sum'
+}).reset_index()
+
+rfm.columns = ['customer_id', 'recency', 'frequency', 'monetary']
+
+# Apply KMeans clustering for segmentation
+kmeans = KMeans(n_clusters=4, random_state=42)
+rfm['segment'] = kmeans.fit_predict(rfm[['recency', 'frequency', 'monetary']])
+
+print(rfm.head())
+
+# Visualization of customer segments
+sns.scatterplot(x='recency', y='monetary', hue='segment', data=rfm)
+plt.title('Customer Segmentation')
+plt.show()
+
+# Customer demographics
+customer_demographics = data.groupby('customer_id').agg({
+    'age': 'mean',
+    'gender': lambda x: x.mode()[0],
+    'location': lambda x: x.mode()[0]
+}).reset_index()
+
+print(customer_demographics.head())
+
+# RFM Analysis
+rfm = data.groupby('customer_id').agg({
+    'transaction_date': lambda x: (datetime.now() - x.max()).days,
+    'transaction_id': 'count',
+    'total_value': 'sum'
+}).reset_index()
+
+rfm.columns = ['customer_id', 'recency', 'frequency', 'monetary']
+
+# Apply KMeans clustering for segmentation
+kmeans = KMeans(n_clusters=4, random_state=42)
+rfm['segment'] = kmeans.fit_predict(rfm[['recency', 'frequency', 'monetary']])
+
+print(rfm.head())
+
+# Visualization of customer segments
+sns.scatterplot(x='recency', y='monetary', hue='segment', data=rfm)
+plt.title('Customer Segmentation')
+plt.show()
+
+# Product popularity
+top_products = data['product_name'].value_counts().head(10)
+top_products.plot(kind='bar')
+plt.title('Top 10 Products')
+plt.xlabel('Product Name')
+plt.ylabel('Number of Transactions')
+plt.show()
+
+# Price analysis
+sns.scatterplot(x='price', y='quantity', data=data)
+plt.title('Price vs Quantity')
+plt.show()
+
+# Prepare data for market basket analysis
+basket = data.pivot_table(index='transaction_id', columns='product_name', values='quantity', aggfunc='sum').fillna(0)
+basket = basket.applymap(lambda x: 1 if x > 0 else 0)
+
+# Apply Apriori algorithm
+frequent_itemsets = apriori(basket, min_support=0.01, use_colnames=True)
+rules = association_rules(frequent_itemsets, metric='lift', min_threshold=1)
+
+print(rules.head())
+
+# Visualization of association rules
+plt.scatter(rules['support'], rules['confidence'], alpha=0.5)
+plt.xlabel('Support')
+plt.ylabel('Confidence')
+plt.title('Association Rules')
+plt.show()
+
      
